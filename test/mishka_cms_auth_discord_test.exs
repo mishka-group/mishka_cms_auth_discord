@@ -5,10 +5,10 @@
 defmodule MishkaCmsAuthDiscordTest do
   use ExUnit.Case, async: true
 
-  test "is a sign-in provider for the core's discord strategy" do
+  test "is a sign-in provider Assent speaks to" do
     assert MishkaCmsCore.Accounts.SignInProvider in behaviours(MishkaCmsAuthDiscord)
     assert MishkaCmsAuthDiscord.id() == "discord"
-    assert MishkaCmsAuthDiscord.strategy() == :discord
+    assert %{assent: Assent.Strategy.Discord} = MishkaCmsAuthDiscord.oauth()
     assert MishkaCmsAuthDiscord.label() == "Discord"
     assert %{path: "M" <> _, color: "text-" <> _} = MishkaCmsAuthDiscord.icon()
   end
@@ -24,26 +24,8 @@ defmodule MishkaCmsAuthDiscordTest do
     assert MishkaCmsAuthDiscord.secret(:team_id, "any-site") == :error
   end
 
-  describe "Discord's user object, read as claims" do
-    test "its id is the sub and its verified flag the email's" do
-      assert %{"sub" => "80351110224678912", "email" => "a@example.com", "email_verified" => true} =
-               MishkaCmsAuthDiscord.user_info(%{
-                 "id" => 80_351_110_224_678_912,
-                 "email" => "a@example.com",
-                 "verified" => true
-               })
-    end
-
-    test "an email is verified only when Discord says exactly true" do
-      for answer <- [
-            %{"id" => 1, "verified" => false},
-            %{"id" => 2, "verified" => "true"},
-            %{"id" => 3},
-            %{"id" => 4, "email_verified" => true}
-          ] do
-        assert MishkaCmsAuthDiscord.user_info(answer)["email_verified"] == false, inspect(answer)
-      end
-    end
+  test "speaks to discord.com, not Assent's older discordapp.com" do
+    assert %{base_url: "https://discord.com/api"} = MishkaCmsAuthDiscord.oauth()
   end
 
   defp behaviours(module),

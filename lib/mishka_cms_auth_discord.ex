@@ -8,25 +8,24 @@ defmodule MishkaCmsAuthDiscord do
   started by `MishkaCmsAuthDiscord.Application`: installed, it adds Discord to every site's Security tab →
   Sign-in methods, where each site switches it on and sets its keys.
 
-  Signing in with a Discord account: AshAuthentication's generic `oauth2` strategy, named `discord`
-  on `MishkaCmsCore.Accounts.User`, pointed at Discord's OAuth2 addresses with the `identify` and
-  `email` scopes, and an application made at discord.com/developers/applications. Under OAuth2 its
-  redirect is the site's `MishkaCmsCore.Accounts.SignInProvider.callback_url/2`.
-
-  Discord answers its own user object, so `user_info/1` reads it as the other providers' claims:
-  its `id` is the `sub`, and its `verified` — whether Discord confirmed the email — is
-  `email_verified`, true only when Discord says exactly `true`. An account with no email, or one
-  Discord has not verified, does not sign in.
+  Signing in with a Discord account: `Assent.Strategy.Discord` through the core's one provider
+  strategy, at discord.com (Assent's default is the older discordapp.com), with the `identify` and
+  `email` scopes and an application made at discord.com/developers/applications. Its OAuth2 redirect
+  is the site's `MishkaCmsCore.Accounts.SignInProvider.callback_url/1`. Assent reads Discord's user
+  object as claims — its `id` the `sub`, its `verified` the `email_verified` — and an account with no
+  email, or one Discord has not verified, does not sign in.
   """
 
   use MishkaCmsCore.Accounts.SignInProvider,
     id: "discord",
-    strategy: :discord,
     label: gettext_noop("Discord"),
     priority: 40
 
   @client_id "auth.providers.discord.client_id"
   @client_secret "auth.providers.discord.client_secret"
+
+  @impl true
+  def oauth, do: %{assent: Assent.Strategy.Discord, base_url: "https://discord.com/api"}
 
   @impl true
   def icon,
@@ -42,7 +41,7 @@ defmodule MishkaCmsAuthDiscord do
       key(@client_id, gettext_noop("Discord client ID"),
         description:
           gettext_noop(
-            "From the OAuth2 page of the Discord application made for this site, at discord.com/developers/applications. Its redirect address is this site's address followed by /api/auth/user/discord/callback."
+            "From the OAuth2 page of the Discord application made for this site, at discord.com/developers/applications. Its redirect address is this site's address followed by /api/auth/user/provider/callback."
           )
       ),
       key(@client_secret, :secret, gettext_noop("Discord client secret"),
@@ -61,13 +60,6 @@ defmodule MishkaCmsAuthDiscord do
     do: present(MishkaCmsCore.Settings.secret(@client_secret, site_id))
 
   def secret(_name, _site_id), do: :error
-
-  @impl true
-  def user_info(%{} = info) do
-    info
-    |> Map.put("sub", to_string(info["id"]))
-    |> Map.put("email_verified", info["verified"] == true)
-  end
 
   defp present(value) when is_binary(value) and value != "", do: {:ok, value}
   defp present(_none), do: :error
