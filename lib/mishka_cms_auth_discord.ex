@@ -5,7 +5,7 @@
 defmodule MishkaCmsAuthDiscord do
   @moduledoc """
   A `mishka_installer` plugin on `"auth:providers"` (`MishkaCmsCore.Accounts.SignInProvider`),
-  started by `MishkaCmsAuthDiscord.Application`: installed, it adds Discord to every site's Security tab →
+  started by MishkaCmsAuthDiscord.Application: installed, it adds Discord to every site's Security tab →
   Sign-in methods, where each site switches it on and sets its keys.
 
   Signing in with a Discord account: `Assent.Strategy.Discord` through the core's one provider
