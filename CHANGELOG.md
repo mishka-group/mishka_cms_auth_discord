@@ -1,3 +1,9 @@
+# Changelog for MishkaCmsAuthDiscord 0.0.3
+
+- Needs mishka_cms_core 0.0.5-alpha.4 and mishka_gervaz 0.0.4, where it needed 0.0.4 and 0.0.3. The Discord sign-in itself does not change
+- Every dependency is at its latest release, including ash 3.37.3, ash_authentication 5.0.0-rc.16, mishka_installer 0.1.16, guarded_struct 0.1.6 and localize 1.6.1
+- `mix hex.audit` and `mix deps.audit` report no retired or vulnerable package
+
 # Changelog for MishkaCmsAuthDiscord 0.0.2
 
 - Needs mishka_cms_core 0.0.4 and mishka_gervaz 0.0.3, where it needed 0.0.2 of each. The core's 0.0.3 release moved the visual editor into the new mishka_cms_builder package. The Discord sign-in itself does not change
